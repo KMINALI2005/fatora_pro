@@ -68,7 +68,7 @@ class FatoraProApp extends StatelessWidget {
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey.shade400,
           indicator: const UnderlineTabIndicator(
-          borderSide: BorderSide(color: Colors.white, width: 3),
+          borderRadius: BorderRadius.all(Radius.circular(8)),
             
           ),
         ),
