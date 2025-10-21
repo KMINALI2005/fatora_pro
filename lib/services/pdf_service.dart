@@ -40,7 +40,7 @@ class PdfService {
         margin: const pw.EdgeInsets.all(30), // هوامش 8mm
         theme: theme,
         build: (pw.Context context) => [
-          _buildHeader(),
+          _buildHeader(invoice),
           _buildInvoiceInfo(invoice, invoiceDate, currentTime),
           _buildItemsTable(invoice),
           _buildQuantitySummary(totalQuantity),
@@ -53,7 +53,7 @@ class PdfService {
     return pdf.save();
   }
 
-  pw.Widget _buildHeader() {
+  pw.Widget _buildHeader(Invoice invoice) {
     // محاكاة الهيدر في index.html
     return pw.Container(
       decoration: pw.BoxDecoration(
