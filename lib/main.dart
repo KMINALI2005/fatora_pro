@@ -65,7 +65,7 @@ class FatoraProApp extends StatelessWidget {
           elevation: 0,
         ),
         tabBarTheme: TabBarThemeData(
-          labelColor: Colors.white,
+          labelColor: Colors.white
           unselectedLabelColor: Colors.grey[400],
           indicator: UnderlineTabIndicator(
           borderSide: BorderSide(color: Colors.white, width: 3),
