@@ -28,7 +28,7 @@ class PdfService {
     // حساب المجاميع
     final double totalQuantity = invoice.items.fold(0, (sum, item) => sum + item.quantity);
     final double remaining = invoice.remainingBalance;
-    final String remainingInWords = NumberToWordsArabic.convert(remaining.toInt());
+    final String remainingInWords = int2words(remaining.toInt(), StrCt.Feminine);
     
     final String currentTime = Formatters.formatArabicTime(DateTime.now());
     final String invoiceDate = Formatters.formatDate(DateTime.parse(invoice.date));
