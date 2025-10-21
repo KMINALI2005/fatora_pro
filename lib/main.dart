@@ -65,14 +65,14 @@ class FatoraProApp extends StatelessWidget {
           elevation: 0,
         ),
         tabBarTheme: TabBarThemeData(
-          labelColor: Colors.white
-          unselectedLabelColor: Colors.grey[400],
-          indicator: UnderlineTabIndicator(
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.grey.shade400,
+          indicator: const UnderlineTabIndicator(
           borderSide: BorderSide(color: Colors.white, width: 3),
             
           ),
         ),
-        cardTheme: CardThemeData(
+        cardTheme: const CardThemeData(
           elevation: 2,
           margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           shape: RoundedRectangleBorder(
