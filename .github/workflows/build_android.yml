@@ -45,21 +45,18 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # الخطوة 6: ترقية المكتبات المسببة للمشكلة
-      - name: Upgrade problematic packages
+      # الخطوة 6: إصلاح مشكلة namespace للمكتبات القديمة
+      - name: Fix namespace issues in dependencies
         run: |
-          flutter pub upgrade flutter_keyboard_visibility
-          flutter pub upgrade file_picker
-
-      # الخطوة 7: إصلاح مشكلة namespace للمكتبات القديمة
-      - name: Fix namespace issues
-        run: |
-          # إضافة namespace لـ flutter_keyboard_visibility إذا كان مفقوداً
-          KEYBOARD_BUILD_FILE="$HOME/.pub-cache/hosted/pub.dev/flutter_keyboard_visibility-5.4.1/android/build.gradle"
-          if [ -f "$KEYBOARD_BUILD_FILE" ] && ! grep -q "namespace" "$KEYBOARD_BUILD_FILE"; then
-            echo "Fixing flutter_keyboard_visibility namespace..."
-            sed -i "/android {/a \    namespace 'com.tuntorius.flutter_keyboard_visibility'" "$KEYBOARD_BUILD_FILE"
-          fi
+          # البحث عن جميع ملفات build.gradle التي تحتاج namespace
+          for plugin in flutter_keyboard_visibility file_picker flutter_plugin_android_lifecycle path_provider_android permission_handler_android printing share_plus sqflite_android; do
+            BUILD_FILE=$(find $HOME/.pub-cache/hosted/pub.dev -name "build.gradle" -path "*/$plugin*/android/*" 2>/dev/null | head -n 1)
+            if [ -f "$BUILD_FILE" ] && ! grep -q "namespace" "$BUILD_FILE"; then
+              echo "Adding namespace to $plugin..."
+              PACKAGE_NAME=$(echo $plugin | sed 's/_/./g')
+              sed -i "/android {/a \    namespace 'com.$PACKAGE_NAME'" "$BUILD_FILE"
+            fi
+          done
 
       # الخطوة 8: بناء ملف الـ APK (النسخة النهائية Release)
       - name: Build APK
