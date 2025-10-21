@@ -5,7 +5,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:number_to_word_arabic/number_to_words_arabic.dart';
+import 'package:number_to_word_arabic/number_to_word_arabic.dart';  // ✅ صحيح (بدون s)
 
 class PdfService {
   
