@@ -30,26 +30,44 @@ jobs:
           java-version: '17'
 
       # الخطوة 3: تثبيت Flutter بالإصدار المحدد
-      # (استخدمنا نفس الإصدار الذي ذكرته لضمان التوافق)
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.0' # ❗️ هذا هو إصدارك المحدد
+          flutter-version: '3.32.0'
           channel: 'stable'
-          cache: true # لتسريع عمليات البناء المستقبلية
+          cache: true
 
-      # الخطوة 4: تثبيت الاعتماديات (Packages)
+      # الخطوة 4: تنظيف المشروع (مهم جداً)
+      - name: Clean project
+        run: flutter clean
+
+      # الخطوة 5: تثبيت الاعتماديات (Packages)
       - name: Install dependencies
         run: flutter pub get
 
-      # الخطوة 5: بناء ملف الـ APK (النسخة النهائية Release)
+      # الخطوة 6: ترقية المكتبات المسببة للمشكلة
+      - name: Upgrade problematic packages
+        run: |
+          flutter pub upgrade flutter_keyboard_visibility
+          flutter pub upgrade file_picker
+
+      # الخطوة 7: إصلاح مشكلة namespace للمكتبات القديمة
+      - name: Fix namespace issues
+        run: |
+          # إضافة namespace لـ flutter_keyboard_visibility إذا كان مفقوداً
+          KEYBOARD_BUILD_FILE="$HOME/.pub-cache/hosted/pub.dev/flutter_keyboard_visibility-5.4.1/android/build.gradle"
+          if [ -f "$KEYBOARD_BUILD_FILE" ] && ! grep -q "namespace" "$KEYBOARD_BUILD_FILE"; then
+            echo "Fixing flutter_keyboard_visibility namespace..."
+            sed -i "/android {/a \    namespace 'com.tuntorius.flutter_keyboard_visibility'" "$KEYBOARD_BUILD_FILE"
+          fi
+
+      # الخطوة 8: بناء ملف الـ APK (النسخة النهائية Release)
       - name: Build APK
         run: flutter build apk --release
 
-      # الخطوة 6: رفع ملف الـ APK الناتج كـ "Artifact"
-      # هذا ما يسمح لك بتحميله بعد انتهاء العملية
+      # الخطوة 9: رفع ملف الـ APK الناتج كـ "Artifact"
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk # اسم الملف الذي ستقوم بتحميله
-          path: build/app/outputs/flutter-apk/app-release.apk # مسار ملف APK الناتج
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
