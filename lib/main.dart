@@ -64,21 +64,20 @@ class FatoraProApp extends StatelessWidget {
           foregroundColor: Colors.white,
           elevation: 0,
         ),
-        tabBarTheme: TabBarTheme(
+        tabBarTheme: TabBarThemeData(
           labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorSize: TabBarIndicatorSize.tab,
-          indicator: BoxDecoration(
-            color: primaryLight.withOpacity(0.8),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+          unselectedLabelColor: Colors.grey[400],
+          indicator: UnderlineTabIndicator(
+          borderSide: BorderSide(color: Colors.white, width: 3),
+            
           ),
         ),
-        cardTheme: CardTheme(
-          elevation: 1,
-          margin: const EdgeInsets.symmetric(vertical: 8.0),
+        cardTheme: CardThemeData(
+          elevation: 2,
+          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: Colors.blue.shade100, width: 2),
+            borderRadius: BorderRadius.circular(8),
+            
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
