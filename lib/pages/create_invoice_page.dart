@@ -1,3 +1,4 @@
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:fatora_pro/models/account.dart';
 import 'package:fatora_pro/models/invoice.dart';
 import 'package:fatora_pro/models/invoice_item.dart';
