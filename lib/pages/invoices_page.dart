@@ -1,4 +1,5 @@
 import 'package:fatora_pro/models/account.dart';  // ✅ أضف هذا في أعلى الملف
+import 'package:fatora_pro/models/product.dart';
 import 'package:fatora_pro/models/invoice.dart';
 import 'package:fatora_pro/pages/create_invoice_page.dart';
 import 'package:fatora_pro/providers/app_provider.dart';
