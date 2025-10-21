@@ -1,3 +1,4 @@
+import 'package:fatora_pro/models/invoice_item.dart';
 import 'dart:typed_data';
 import 'package:fatora_pro/models/invoice.dart';
 import 'package:fatora_pro/utils/formatters.dart';
