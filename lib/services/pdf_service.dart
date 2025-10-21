@@ -5,7 +5,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:number_to_words_arabic/number_to_words_arabic.dart';
+import 'package:number_to_word_arabic/number_to_words_arabic.dart';
 
 class PdfService {
   
@@ -28,7 +28,7 @@ class PdfService {
     // حساب المجاميع
     final double totalQuantity = invoice.items.fold(0, (sum, item) => sum + item.quantity);
     final double remaining = invoice.remainingBalance;
-    final String remainingInWords = int2words(remaining.toInt(), StrCt.Feminine);
+    final String remainingInWords = Tafqeet.convert(remaining.toInt().toString());
     
     final String currentTime = Formatters.formatArabicTime(DateTime.now());
     final String invoiceDate = Formatters.formatDate(DateTime.parse(invoice.date));
