@@ -1,3 +1,4 @@
+import 'package:fatora_pro/models/account.dart';
 import 'package:fatora_pro/models/invoice.dart';
 import 'package:fatora_pro/models/invoice_item.dart';
 import 'package:fatora_pro/models/product.dart';
