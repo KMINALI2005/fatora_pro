@@ -1,0 +1,55 @@
+# اسم الـ Action الذي سيظهر في حسابك
+name: Build Android APK
+
+# هذا يحدد متى يتم تشغيل الـ Action
+on:
+  # 1. التشغيل عند أي عملية push على الفرع main
+  push:
+    branches:
+      - main
+      - master # (إذا كان اسم الفرع الرئيسي عندك master)
+      
+  # 2. السماح بالتشغيل اليدوي من داخل صفحة Actions في GitHub
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    # سيتم استخدام خادم Ubuntu الأحدث لبناء التطبيق
+    runs-on: ubuntu-latest
+
+    steps:
+      # الخطوة 1: سحب الكود من المستودع
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # الخطوة 2: تثبيت الجافا (JDK)، وهي ضرورية لبناء تطبيقات أندرويد
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # الخطوة 3: تثبيت Flutter بالإصدار المحدد
+      # (استخدمنا نفس الإصدار الذي ذكرته لضمان التوافق)
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.0' # ❗️ هذا هو إصدارك المحدد
+          channel: 'stable'
+          cache: true # لتسريع عمليات البناء المستقبلية
+
+      # الخطوة 4: تثبيت الاعتماديات (Packages)
+      - name: Install dependencies
+        run: flutter pub get
+
+      # الخطوة 5: بناء ملف الـ APK (النسخة النهائية Release)
+      - name: Build APK
+        run: flutter build apk --release
+
+      # الخطوة 6: رفع ملف الـ APK الناتج كـ "Artifact"
+      # هذا ما يسمح لك بتحميله بعد انتهاء العملية
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk # اسم الملف الذي ستقوم بتحميله
+          path: build/app/outputs/flutter-apk/app-release.apk # مسار ملف APK الناتج
