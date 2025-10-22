@@ -23,7 +23,7 @@ dependencies:
   provider: ^6.1.2
 
   # 🎨 أدوات الواجهة
-  intl: ^0.19.0  # ✅ إصدار مستقر
+  intl: ^0.20.2  # ✅ إصدار مستقر
   flutter_typeahead: ^5.2.0
   cupertino_icons: ^1.0.8
   

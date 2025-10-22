@@ -1,70 +1,110 @@
-# اسم الـ Action الذي سيظهر في حسابك
+# اسم الـ Action
 name: Build Android APK
 
-# هذا يحدد متى يتم تشغيل الـ Action
 on:
-  # 1. التشغيل عند أي عملية push على الفرع main
   push:
     branches:
       - main
-      - master # (إذا كان اسم الفرع الرئيسي عندك master)
-      
-  # 2. السماح بالتشغيل اليدوي من داخل صفحة Actions في GitHub
+      - master
   workflow_dispatch:
 
 jobs:
   build-apk:
-    # سيتم استخدام خادم Ubuntu الأحدث لبناء التطبيق
     runs-on: ubuntu-latest
-
+    
     steps:
-      # الخطوة 1: سحب الكود من المستودع
+      # 1. سحب الكود
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # الخطوة 2: تثبيت الجافا (JDK)، وهي ضرورية لبناء تطبيقات أندرويد
+      # 2. تثبيت Java 17
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # الخطوة 3: تثبيت Flutter بالإصدار المحدد
+      # 3. تثبيت Flutter
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.0'
+          flutter-version: '3.27.1'  # ✅ إصدار مستقر أحدث
           channel: 'stable'
           cache: true
 
-      # الخطوة 4: تنظيف المشروع (مهم جداً)
+      # 4. التحقق من إصدار Flutter
+      - name: Verify Flutter installation
+        run: |
+          flutter --version
+          flutter doctor -v
+
+      # 5. تنظيف المشروع
       - name: Clean project
         run: flutter clean
 
-      # الخطوة 5: تثبيت الاعتماديات (Packages)
-      - name: Install dependencies
+      # 6. الحصول على المكتبات
+      - name: Get dependencies
         run: flutter pub get
 
-      # الخطوة 6: إصلاح مشكلة namespace للمكتبات القديمة
-      - name: Fix namespace issues in dependencies
+      # 7. إصلاح مشاكل namespace للمكتبات
+      - name: Fix namespace issues
         run: |
-          # البحث عن جميع ملفات build.gradle التي تحتاج namespace
-          for plugin in flutter_keyboard_visibility file_picker flutter_plugin_android_lifecycle path_provider_android permission_handler_android printing share_plus sqflite_android; do
-            BUILD_FILE=$(find $HOME/.pub-cache/hosted/pub.dev -name "build.gradle" -path "*/$plugin*/android/*" 2>/dev/null | head -n 1)
-            if [ -f "$BUILD_FILE" ] && ! grep -q "namespace" "$BUILD_FILE"; then
-              echo "Adding namespace to $plugin..."
-              PACKAGE_NAME=$(echo $plugin | sed 's/_/./g')
-              sed -i "/android {/a \    namespace 'com.$PACKAGE_NAME'" "$BUILD_FILE"
+          # قائمة المكتبات التي تحتاج namespace
+          PLUGINS=(
+            "flutter_keyboard_visibility"
+            "file_picker"
+            "flutter_plugin_android_lifecycle"
+            "path_provider_android"
+            "permission_handler_android"
+            "printing"
+            "share_plus"
+            "sqflite"
+          )
+          
+          for plugin in "${PLUGINS[@]}"; do
+            # البحث عن build.gradle
+            BUILD_FILE=$(find ~/.pub-cache -name "build.gradle" -path "*/${plugin}*/android/*" 2>/dev/null | head -n 1)
+            
+            if [ -f "$BUILD_FILE" ]; then
+              echo "Processing: $BUILD_FILE"
+              
+              # التحقق إذا كان namespace موجود مسبقاً
+              if ! grep -q "namespace" "$BUILD_FILE"; then
+                echo "Adding namespace to $plugin..."
+                
+                # تحويل اسم المكتبة إلى package name
+                PACKAGE_NAME=$(echo $plugin | sed 's/_/./g')
+                
+                # إضافة namespace بعد سطر "android {"
+                sed -i "/android {/a \    namespace 'com.$PACKAGE_NAME'" "$BUILD_FILE"
+                
+                echo "✅ Fixed: $plugin"
+              else
+                echo "⏭️  Skipped (already has namespace): $plugin"
+              fi
+            else
+              echo "⚠️  Not found: $plugin"
             fi
           done
 
-      # الخطوة 8: بناء ملف الـ APK (النسخة النهائية Release)
+      # 8. بناء APK
       - name: Build APK
-        run: flutter build apk --release
+        run: |
+          flutter build apk --release --verbose
 
-      # الخطوة 9: رفع ملف الـ APK الناتج كـ "Artifact"
-      - name: Upload APK artifact
+      # 9. رفع APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
+          name: fatora-pro-release
           path: build/app/outputs/flutter-apk/app-release.apk
+          
+      # 10. إنشاء Release (اختياري)
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
